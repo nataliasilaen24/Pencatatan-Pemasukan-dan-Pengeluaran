@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f7fc">
+    <title>KeuanganKu - Dashboard Keuangan</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <symbol id="icon-grid" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+        </symbol>
+        <symbol id="icon-list" viewBox="0 0 24 24">
+            <path d="M8 6h13M8 12h13M8 18h13"></path>
+            <path d="M3 6h.01M3 12h.01M3 18h.01"></path>
+        </symbol>
+        <symbol id="icon-plus" viewBox="0 0 24 24">
+            <path d="M12 5v14M5 12h14"></path>
+        </symbol>
+        <symbol id="icon-chart" viewBox="0 0 24 24">
+            <path d="M4 19V5M4 19h17"></path>
+            <path d="m7 15 4-4 3 2 6-7"></path>
+        </symbol>
+        <symbol id="icon-tag" viewBox="0 0 24 24">
+            <path d="M20 13 13 20 3 10V4h6l11 9Z"></path>
+            <circle cx="7.5" cy="8" r="1"></circle>
+        </symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 21a8 8 0 0 1 16 0"></path>
+        </symbol>
+        <symbol id="icon-logout" viewBox="0 0 24 24">
+            <path d="M10 17l5-5-5-5M15 12H3"></path>
+            <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"></path>
+        </symbol>
+        <symbol id="icon-bell" viewBox="0 0 24 24">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+            <path d="M10 21h4"></path>
+        </symbol>
+        <symbol id="icon-calendar" viewBox="0 0 24 24">
+            <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+            <path d="M16 3v4M8 3v4M3 10h18"></path>
+        </symbol>
+        <symbol id="icon-save" viewBox="0 0 24 24">
+            <path d="M5 3h12l4 4v14H3V3h2Z"></path>
+            <path d="M7 3v6h10V3M7 21v-8h10v8"></path>
+        </symbol>
+        <symbol id="icon-history" viewBox="0 0 24 24">
+            <path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"></path>
+            <path d="M3 3v5h5M12 7v5l3 2"></path>
+        </symbol>
+        <symbol id="icon-wallet" viewBox="0 0 24 24">
+            <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v16H6.5A2.5 2.5 0 0 1 4 17.5v-11Z"></path>
+            <path d="M4 7h16M16 13h4"></path>
+            <circle cx="16" cy="13" r=".6"></circle>
+        </symbol>
+        <symbol id="icon-arrow-up" viewBox="0 0 24 24">
+            <path d="M7 17 17 7M7 7h10v10"></path>
+        </symbol>
+        <symbol id="icon-arrow-down" viewBox="0 0 24 24">
+            <path d="m7 7 10 10M17 7v10H7"></path>
+        </symbol>
+        <symbol id="icon-sparkle" viewBox="0 0 24 24">
+            <path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"></path>
+            <path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"></path>
+        </symbol>
+    </svg>
+
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" href="#" data-view-link="dashboard" aria-label="KeuanganKu, Dashboard">
+                <span class="brand-mark">
+                    <svg class="icon"><use href="#icon-wallet"></use></svg>
+                </span>
+                <span class="brand-name">KeuanganKu</span>
+            </a>
+
+            <nav class="sidebar-nav" aria-label="Menu utama">
+                <p class="nav-caption">MENU UTAMA</p>
+                <button class="nav-link is-active" type="button" data-view="dashboard" aria-current="page">
+                    <svg class="icon"><use href="#icon-grid"></use></svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-link" type="button" data-view="transactions">
+                    <svg class="icon"><use href="#icon-list"></use></svg>
+                    <span>Transaksi</span>
+                </button>
+                <button class="nav-link" type="button" data-action="add-transaction">
+                    <svg class="icon"><use href="#icon-plus"></use></svg>
+                    <span>Tambah Transaksi</span>
+                </button>
+
+                <p class="nav-caption nav-caption-spaced">PENGELOLAAN</p>
+                <button class="nav-link" type="button" data-view="reports">
+                    <svg class="icon"><use href="#icon-chart"></use></svg>
+                    <span>Laporan Keuangan</span>
+                </button>
+                <button class="nav-link" type="button" data-view="categories">
+                    <svg class="icon"><use href="#icon-tag"></use></svg>
+                    <span>Kategori</span>
+                </button>
+
+                <p class="nav-caption nav-caption-spaced">AKUN</p>
+                <button class="nav-link" type="button" data-view="profile">
+                    <svg class="icon"><use href="#icon-user"></use></svg>
+                    <span>Profil Saya</span>
+                </button>
+                <button class="nav-link" type="button" data-action="logout">
+                    <svg class="icon"><use href="#icon-logout"></use></svg>
+                    <span>Logout</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-art" aria-hidden="true">
+                <span class="art-leaf leaf-one"></span>
+                <span class="art-leaf leaf-two"></span>
+                <span class="art-leaf leaf-three"></span>
+                <span class="art-coin coin-one"></span>
+                <span class="art-coin coin-two"></span>
+                <div class="art-wallet">
+                    <svg class="icon"><use href="#icon-wallet"></use></svg>
+                    <span></span>
+                </div>
+            </div>
+
+            <div class="sidebar-note">
+                <span class="storage-dot"></span>
+                <span>Data tersimpan di perangkat ini</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h1 id="pageTitle">Halo, Natalia! <span class="wave" aria-hidden="true">👋</span></h1>
+                    <p class="topbar-date" id="tanggalHariIni">Pantau keuanganmu dengan mudah dan teratur</p>
+                </div>
+                <div class="topbar-tools">
+                    <button class="notification-button" type="button" data-action="notifications" aria-label="Notifikasi">
+                        <svg class="icon"><use href="#icon-bell"></use></svg>
+                    </button>
+                    <button class="profile-chip" type="button" data-view="profile">
+                        <span class="avatar" aria-hidden="true">N</span>
+                        <span>Natalia</span>
+                        <span class="profile-chevron" aria-hidden="true">⌄</span>
+                    </button>
+                </div>
+            </header>
+
+            <div id="globalFeedback" class="feedback" role="status" aria-live="polite" hidden></div>
+
+            <section id="dashboardView" class="page-view" aria-labelledby="dashboardTitle">
+                <h2 class="visually-hidden" id="dashboardTitle">Dashboard</h2>
+                <div class="summary">
+                    <article class="summary-card balance-card">
+                        <div class="summary-card-top">
+                            <span class="summary-icon">
+                                <svg class="icon"><use href="#icon-wallet"></use></svg>
+                            </span>
+                            <span class="summary-label">Total Saldo</span>
+                        </div>
+                        <p class="summary-value" id="saldo">Rp0</p>
+                        <p class="summary-footnote" id="saldoTrend">
+                            <span class="trend-arrow" aria-hidden="true"></span>
+                            <span id="saldoTrendValue">0% dari bulan lalu</span>
+                        </p>
+                    </article>
+                    <article class="summary-card income-card">
+                        <div class="summary-card-top">
+                            <span class="summary-icon">
+                                <svg class="icon"><use href="#icon-arrow-down"></use></svg>
+                            </span>
+                            <span class="summary-label">Total Pemasukan</span>
+                        </div>
+                        <p class="summary-value" id="pemasukan">Rp0</p>
+                        <p class="summary-footnote" id="pemasukanTrend">
+                            <span class="trend-arrow" aria-hidden="true"></span>
+                            <span id="pemasukanTrendValue">0% dari bulan lalu</span>
+                        </p>
+                    </article>
+                    <article class="summary-card expense-card">
+                        <div class="summary-card-top">
+                            <span class="summary-icon">
+                                <svg class="icon"><use href="#icon-arrow-up"></use></svg>
+                            </span>
+                            <span class="summary-label">Total Pengeluaran</span>
+                        </div>
+                        <p class="summary-value" id="pengeluaran">Rp0</p>
+                        <p class="summary-footnote" id="pengeluaranTrend">
+                            <span class="trend-arrow" aria-hidden="true"></span>
+                            <span id="pengeluaranTrendValue">0% dari bulan lalu</span>
+                        </p>
+                    </article>
+                </div>
+
+                <div class="dashboard-grid">
+                    <section class="panel chart-panel" aria-labelledby="chartTitle">
+                        <div class="panel-heading">
+                            <div>
+                                <div class="panel-title-row">
+                                    <span class="panel-title-icon">
+                                        <svg class="icon"><use href="#icon-chart"></use></svg>
+                                    </span>
+                                    <h2 id="chartTitle">Grafik Keuangan</h2>
+                                </div>
+                            </div>
+                            <label class="month-picker">
+                                <svg class="icon"><use href="#icon-calendar"></use></svg>
+                                <span class="visually-hidden">Pilih bulan grafik</span>
+                                <select id="chartMonthFilter" aria-label="Pilih bulan grafik"></select>
+                            </label>
+                        </div>
+                        <div class="chart-legend">
+                            <span><i class="legend-dot income-dot"></i>Pemasukan</span>
+                            <span><i class="legend-dot expense-dot"></i>Pengeluaran</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="financeChart" role="img" aria-label="Grafik pemasukan dan pengeluaran berdasarkan hari pada bulan yang dipilih"></canvas>
+                            <p id="chartFallback" class="chart-fallback" hidden>
+                                Grafik belum dapat dimuat. Ringkasan transaksi tetap tersedia.
+                            </p>
+                        </div>
+                    </section>
+
+                    <section class="panel quick-panel" aria-labelledby="quickTitle">
+                        <div class="panel-heading">
+                            <div class="panel-title-row">
+                                <span class="quick-title-icon">
+                                    <svg class="icon"><use href="#icon-plus"></use></svg>
+                                </span>
+                                <h2 id="quickTitle">Tambah Transaksi</h2>
+                            </div>
+                        </div>
+                        <form id="quickForm" class="quick-form">
+                            <label class="quick-field">
+                                <span>Nama transaksi</span>
+                                <input type="text" id="quickKeterangan" maxlength="100" placeholder="Nama transaksi" required>
+                            </label>
+                            <label class="quick-field">
+                                <span>Jumlah uang</span>
+                                <input type="number" id="quickJumlah" min="1" step="1" placeholder="Jumlah uang" required>
+                            </label>
+                            <label class="quick-field">
+                                <span>Kategori</span>
+                                <select id="quickKategori" required></select>
+                            </label>
+                            <label class="quick-field">
+                                <span>Jenis Transaksi</span>
+                                <select id="quickJenis" required>
+                                    <option value="pemasukan">Pemasukan</option>
+                                    <option value="pengeluaran">Pengeluaran</option>
+                                </select>
+                            </label>
+                            <label class="quick-field">
+                                <span>Tanggal</span>
+                                <input type="date" id="quickTanggal" required>
+                            </label>
+                            <label class="quick-field">
+                                <span>Catatan (opsional)</span>
+                                <input type="text" id="quickCatatan" maxlength="200" placeholder="Catatan (opsional)">
+                            </label>
+                            <button class="primary-button quick-submit" type="submit">
+                                <svg class="icon"><use href="#icon-save"></use></svg>
+                                Simpan Transaksi
+                            </button>
+                        </form>
+                    </section>
+                </div>
+
+                <div class="history-grid">
+                    <section class="panel recent-panel" aria-labelledby="recentTitle">
+                        <div class="panel-heading history-heading">
+                            <div class="panel-title-row">
+                                <span class="history-title-icon">
+                                    <svg class="icon"><use href="#icon-history"></use></svg>
+                                </span>
+                                <h2 id="recentTitle">Riwayat Transaksi</h2>
+                            </div>
+                            <div class="history-filters">
+                                <label>
+                                    <span class="visually-hidden">Cari transaksi</span>
+                                    <input type="search" id="dashboardSearch" placeholder="Cari transaksi...">
+                                </label>
+                                <label>
+                                    <span class="visually-hidden">Filter jenis</span>
+                                    <select id="dashboardFilterType">
+                                        <option value="">Semua jenis</option>
+                                        <option value="pemasukan">Pemasukan</option>
+                                        <option value="pengeluaran">Pengeluaran</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    <span class="visually-hidden">Filter kategori</span>
+                                    <select id="dashboardFilterCategory">
+                                        <option value="">Semua kategori</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Tanggal</th>
+                                        <th scope="col">Keterangan</th>
+                                        <th scope="col">Kategori</th>
+                                        <th scope="col">Jenis</th>
+                                        <th scope="col" class="amount-column">Jumlah</th>
+                                        <th scope="col" class="action-column">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transaksiTerbaru"></tbody>
+                            </table>
+                        </div>
+                        <button class="text-button history-link" type="button" data-view="transactions">
+                            Lihat semua transaksi <span aria-hidden="true">&rarr;</span>
+                        </button>
+                    </section>
+
+                    <aside class="panel monthly-panel" aria-labelledby="monthlyTitle">
+                        <div class="panel-title-row monthly-title">
+                            <span class="monthly-title-icon" aria-hidden="true">💡</span>
+                            <h2 id="monthlyTitle">Ringkasan Bulan Ini</h2>
+                        </div>
+                        <p class="monthly-period" id="monthlyPeriod"></p>
+                        <div class="monthly-row">
+                            <span class="monthly-label"><span class="monthly-arrow income-arrow">↑</span>Pemasukan</span>
+                            <strong id="monthlyIncome">Rp0</strong>
+                        </div>
+                        <div class="monthly-row">
+                            <span class="monthly-label"><span class="monthly-arrow expense-arrow">↓</span>Pengeluaran</span>
+                            <strong id="monthlyExpense">Rp0</strong>
+                        </div>
+                        <div class="monthly-divider"></div>
+                        <div class="monthly-row monthly-balance-row">
+                            <span class="monthly-label"><span class="monthly-wallet" aria-hidden="true">◉</span>Saldo Akhir</span>
+                            <strong id="monthlyBalance">Rp0</strong>
+                        </div>
+                        <p class="monthly-status" id="monthlyStatus">
+                            <span class="status-check" aria-hidden="true">✓</span>
+                            <span id="financialMessage">Mulai catat transaksi bulan ini.</span>
+                        </p>
+                    </aside>
+                </div>
+            </section>
+
+            <section id="transactionsView" class="page-view" aria-labelledby="transactionsTitle" hidden>
+                <div class="page-heading">
+                    <div>
+                        <p class="eyebrow">KELOLA KEUANGAN</p>
+                        <h2 id="transactionsTitle">Semua Transaksi</h2>
+                        <p class="page-description">Catat dan pantau setiap pemasukan maupun pengeluaranmu.</p>
+                    </div>
+                    <button class="primary-button" id="toggleFormButton" type="button">
+                        <svg class="icon"><use href="#icon-plus"></use></svg>
+                        <span>Tambah Transaksi</span>
+                    </button>
+                </div>
+
+                <div id="transactionFeedback" class="feedback" role="status" aria-live="polite" hidden></div>
+
+                <section id="transactionFormPanel" class="panel transaction-form-panel" aria-labelledby="formTitle" hidden>
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">FORMULIR</p>
+                            <h2 id="formTitle">Tambah transaksi baru</h2>
+                        </div>
+                        <button class="icon-button" id="closeFormButton" type="button" aria-label="Tutup formulir">&times;</button>
+                    </div>
+                    <form id="formTransaksi">
+                        <input type="hidden" id="transactionId">
+                        <label class="field">
+                            <span>Tanggal</span>
+                            <input type="date" id="tanggal" required>
+                        </label>
+                        <label class="field">
+                            <span>Nama transaksi</span>
+                            <input type="text" id="keterangan" maxlength="100" placeholder="Contoh: Gaji bulanan" required>
+                        </label>
+                        <label class="field">
+                            <span>Kategori</span>
+                            <select id="kategori" required></select>
+                        </label>
+                        <label class="field">
+                            <span>Jenis transaksi</span>
+                            <select id="jenis" required>
+                                <option value="pemasukan">Pemasukan</option>
+                                <option value="pengeluaran">Pengeluaran</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>Jumlah uang</span>
+                            <input type="number" id="jumlah" min="1" step="1" placeholder="Contoh: 1500000" required>
+                        </label>
+                        <label class="field field-notes">
+                            <span>Catatan <span class="optional-label">(opsional)</span></span>
+                            <input type="text" id="catatan" maxlength="200" placeholder="Tambahkan catatan jika diperlukan">
+                        </label>
+                        <div class="form-actions">
+                            <button class="secondary-button" id="cancelEditButton" type="button" hidden>Batalkan</button>
+                            <button class="primary-button" id="saveTransactionButton" type="submit">
+                                <svg class="icon"><use href="#icon-plus"></use></svg>
+                                <span>Simpan Transaksi</span>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="panel transactions-panel" aria-labelledby="allTransactionsTitle">
+                    <div class="panel-heading transactions-panel-heading">
+                        <div>
+                            <p class="eyebrow">RIWAYAT</p>
+                            <h2 id="allTransactionsTitle">Daftar transaksi</h2>
+                        </div>
+                    </div>
+                    <div class="filters">
+                        <label class="search-field">
+                            <span class="visually-hidden">Cari nama transaksi</span>
+                            <svg class="icon"><use href="#icon-list"></use></svg>
+                            <input type="search" id="searchTransaksi" placeholder="Cari transaksi...">
+                        </label>
+                        <label class="filter-field">
+                            <span class="visually-hidden">Filter jenis transaksi</span>
+                            <select id="filterJenis">
+                                <option value="">Semua jenis</option>
+                                <option value="pemasukan">Pemasukan</option>
+                                <option value="pengeluaran">Pengeluaran</option>
+                            </select>
+                        </label>
+                        <label class="filter-field">
+                            <span class="visually-hidden">Tanggal mulai</span>
+                            <input type="date" id="filterMulai" aria-label="Tanggal mulai">
+                        </label>
+                        <label class="filter-field">
+                            <span class="visually-hidden">Tanggal akhir</span>
+                            <input type="date" id="filterSampai" aria-label="Tanggal akhir">
+                        </label>
+                        <button class="secondary-button clear-filter-button" id="clearFiltersButton" type="button">Reset filter</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Tanggal</th>
+                                    <th scope="col">Keterangan</th>
+                                    <th scope="col">Kategori</th>
+                                    <th scope="col">Jenis</th>
+                                    <th scope="col" class="amount-column">Jumlah</th>
+                                    <th scope="col">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="daftarTransaksi"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+
+            <section id="reportsView" class="page-view" aria-labelledby="reportsTitle" hidden>
+                <div class="page-heading">
+                    <div>
+                        <p class="eyebrow">LAPORAN KEUANGAN</p>
+                        <h2 id="reportsTitle">Laporan Keuangan</h2>
+                        <p class="page-description">Pantau pemasukan dan pengeluaran berdasarkan periode dan kategori.</p>
+                    </div>
+                    <button class="secondary-button" id="exportReportButton" type="button">
+                        <svg class="icon"><use href="#icon-save"></use></svg>
+                        Ekspor CSV
+                    </button>
+                </div>
+
+                <div id="reportFeedback" class="feedback" role="status" aria-live="polite" hidden></div>
+
+                <section class="panel report-filter-panel">
+                    <div class="report-filters">
+                        <label class="field">
+                            <span>Periode laporan</span>
+                            <select id="reportPeriod">
+                                <option value="daily">Harian</option>
+                                <option value="weekly">Mingguan</option>
+                                <option value="monthly" selected>Bulanan</option>
+                                <option value="custom">Rentang tanggal</option>
+                            </select>
+                        </label>
+                        <label class="field report-control" id="reportDateControl" hidden>
+                            <span>Pilih tanggal</span>
+                            <input type="date" id="reportDate">
+                        </label>
+                        <label class="field report-control" id="reportMonthControl">
+                            <span>Pilih bulan</span>
+                            <input type="month" id="reportMonth">
+                        </label>
+                        <div class="report-range" id="reportCustomControls" hidden>
+                            <label class="field">
+                                <span>Dari tanggal</span>
+                                <input type="date" id="reportStart">
+                            </label>
+                            <label class="field">
+                                <span>Sampai tanggal</span>
+                                <input type="date" id="reportEnd">
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="report-summary">
+                    <article class="report-stat report-income">
+                        <span>Total Pemasukan</span>
+                        <strong id="reportIncome">Rp0</strong>
+                    </article>
+                    <article class="report-stat report-expense">
+                        <span>Total Pengeluaran</span>
+                        <strong id="reportExpense">Rp0</strong>
+                    </article>
+                    <article class="report-stat report-balance">
+                        <span>Selisih Periode</span>
+                        <strong id="reportBalance">Rp0</strong>
+                    </article>
+                    <article class="report-stat report-count">
+                        <span>Jumlah Transaksi</span>
+                        <strong id="reportCount">0</strong>
+                    </article>
+                </div>
+
+                <div class="report-grid">
+                    <section class="panel report-chart-panel" aria-labelledby="reportChartTitle">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">VISUALISASI</p>
+                                <h2 id="reportChartTitle">Ringkasan per kategori</h2>
+                            </div>
+                        </div>
+                        <div class="report-chart-container">
+                            <canvas id="reportChart" role="img" aria-label="Grafik pemasukan dan pengeluaran per kategori"></canvas>
+                            <p id="reportChartFallback" class="chart-fallback" hidden>
+                                Grafik belum dapat dimuat. Rincian laporan tetap tersedia.
+                            </p>
+                            <p id="reportChartEmpty" class="chart-empty" hidden>
+                                Belum ada transaksi untuk ditampilkan pada periode ini.
+                            </p>
+                        </div>
+                    </section>
+                    <section class="panel report-category-panel" aria-labelledby="reportCategoryTitle">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">RINCIAN</p>
+                                <h2 id="reportCategoryTitle">Rekap kategori</h2>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Kategori</th>
+                                        <th scope="col" class="amount-column">Pemasukan</th>
+                                        <th scope="col" class="amount-column">Pengeluaran</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportCategoryBody"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <section class="panel report-transactions-panel" aria-labelledby="reportTransactionsTitle">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">DETAIL PERIODE</p>
+                            <h2 id="reportTransactionsTitle">Transaksi dalam laporan</h2>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Tanggal</th>
+                                    <th scope="col">Keterangan</th>
+                                    <th scope="col">Kategori</th>
+                                    <th scope="col">Jenis</th>
+                                    <th scope="col" class="amount-column">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTransactionsBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+
+            <section id="categoriesView" class="page-view" aria-labelledby="categoriesTitle" hidden>
+                <div class="page-heading">
+                    <div>
+                        <p class="eyebrow">PENGELOLAAN</p>
+                        <h2 id="categoriesTitle">Kategori Transaksi</h2>
+                        <p class="page-description">Atur kategori yang digunakan untuk mengelompokkan transaksi.</p>
+                    </div>
+                </div>
+
+                <div id="categoryFeedback" class="feedback" role="status" aria-live="polite" hidden></div>
+
+                <div class="category-manager-grid">
+                    <section class="panel category-form-panel" aria-labelledby="categoryFormTitle">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">KATEGORI BARU</p>
+                                <h2 id="categoryFormTitle">Tambah kategori</h2>
+                            </div>
+                        </div>
+                        <form id="categoryForm" class="category-form">
+                            <input type="hidden" id="originalCategory">
+                            <label class="field">
+                                <span>Jenis transaksi</span>
+                                <select id="categoryType" required>
+                                    <option value="pemasukan">Pemasukan</option>
+                                    <option value="pengeluaran">Pengeluaran</option>
+                                </select>
+                            </label>
+                            <label class="field">
+                                <span>Nama kategori</span>
+                                <input type="text" id="categoryName" maxlength="40" placeholder="Contoh: Hadiah" required>
+                            </label>
+                            <div class="category-form-actions">
+                                <button class="secondary-button" id="cancelCategoryEdit" type="button" hidden>Batalkan</button>
+                                <button class="primary-button" id="saveCategoryButton" type="submit">Simpan Kategori</button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="panel category-list-panel" aria-labelledby="categoryListTitle">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">DAFTAR KATEGORI</p>
+                                <h2 id="categoryListTitle">Kategori yang tersedia</h2>
+                            </div>
+                        </div>
+                        <div class="category-columns">
+                            <section class="category-group" aria-labelledby="incomeCategoriesTitle">
+                                <h3 id="incomeCategoriesTitle">Pemasukan</h3>
+                                <ul id="incomeCategoryList" class="category-list"></ul>
+                            </section>
+                            <section class="category-group" aria-labelledby="expenseCategoriesTitle">
+                                <h3 id="expenseCategoriesTitle">Pengeluaran</h3>
+                                <ul id="expenseCategoryList" class="category-list"></ul>
+                            </section>
+                        </div>
+                        <p class="category-note">Kategori yang sedang digunakan transaksi tidak dapat dihapus.</p>
+                    </section>
+                </div>
+            </section>
+
+            <section id="moduleView" class="page-view" aria-labelledby="moduleTitle" hidden>
+                <div class="page-heading">
+                    <div>
+                        <p class="eyebrow" id="moduleEyebrow">INFORMASI</p>
+                        <h2 id="moduleTitle"></h2>
+                        <p class="page-description" id="moduleDescription"></p>
+                    </div>
+                    <button class="secondary-button" type="button" data-view="dashboard">Kembali ke Dashboard</button>
+                </div>
+                <section class="panel module-panel">
+                    <div class="module-icon">
+                        <svg class="icon"><use id="moduleIcon" href="#icon-sparkle"></use></svg>
+                    </div>
+                    <p class="eyebrow">STATUS FITUR</p>
+                    <h3 id="moduleStatus"></h3>
+                    <p class="module-message" id="moduleMessage"></p>
+                    <ul class="module-details" id="moduleDetails"></ul>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="js/script.js" defer></script>
+</body>
+</html>
