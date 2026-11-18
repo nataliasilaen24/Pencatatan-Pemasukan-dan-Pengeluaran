@@ -19,9 +19,12 @@ pengelolaan transaksi di frontend.
 - Penyimpanan sementara menggunakan `localStorage` pada browser yang digunakan.
 - Tampilan responsif untuk desktop dan smartphone.
 
-Versi ini menggunakan PHP session, API PHP, dan database PostgreSQL. Data
-transaksi dan kategori dipisahkan berdasarkan akun pengguna. Password disimpan
-dalam bentuk hash dan koneksi database menggunakan prepared statements.
+Aplikasi menyediakan mode lokal yang dapat dibuka langsung dari `index.html`
+serta mode backend PHP dengan PostgreSQL. Mode lokal menyimpan data di browser
+dan tidak memerlukan login atau server. Mode backend memerlukan server PHP dan
+PostgreSQL; data transaksi dan kategori dipisahkan berdasarkan akun pengguna.
+Password disimpan dalam bentuk hash dan koneksi database menggunakan prepared
+statements.
 
 ## Lokasi file
 
@@ -47,35 +50,53 @@ Pencatatan-Pemasukan-dan-Pengeluaran/
 └── README.md
 ```
 
-## Menjalankan dengan PostgreSQL dan Apache XAMPP
+## Membuka langsung untuk demo lokal
 
-1. Pasang dan buka XAMPP.
-2. Salin folder proyek ke dalam folder `htdocs`, misalnya:
-   `C:\xampp\htdocs\Pencatatan-Pemasukan-dan-Pengeluaran`
-3. Pasang PostgreSQL lokal dan jalankan servicenya. **MySQL di XAMPP tidak diperlukan**.
-4. Aktifkan ekstensi PostgreSQL untuk PHP XAMPP dengan membuka
-   `C:\xampp\php\php.ini`, menghapus tanda `;` pada baris `extension=pdo_pgsql`,
-   lalu restart Apache. Pastikan perintah berikut menampilkan `pdo_pgsql`:
+Klik dua kali `frontend\index.html` di File Explorer. Aplikasi akan berjalan
+dalam mode lokal: transaksi dan kategori tersimpan di `localStorage` browser,
+tanpa login, PHP, Apache, atau PostgreSQL. Data hanya tersedia pada browser dan
+perangkat yang sama. Pada mode ini, perubahan tidak masuk ke database PostgreSQL.
+
+## Menjalankan mode backend dengan PostgreSQL tanpa Apache XAMPP
+
+Untuk penggunaan berikutnya, klik dua kali `buka-keuanganku.bat` dari folder
+proyek. Launcher menjalankan server PHP bawaan tanpa Apache dan membuka
+`frontend/index.html` melalui `http://127.0.0.1:8000/`. Pastikan PostgreSQL
+aktif dan `backend\.env` sudah diisi. Tutup jendela server PHP untuk
+menghentikannya.
+
+1. Pasang PostgreSQL untuk Windows, lalu buka `services.msc` dan pastikan
+   service PostgreSQL berstatus **Running**. MySQL di XAMPP tidak diperlukan.
+2. Pastikan PHP tersedia. Jika menggunakan PHP dari XAMPP, Apache tidak perlu
+   dinyalakan. Aktifkan ekstensi `pdo_pgsql` di
+   `C:\xampp\php\php.ini` (hapus tanda `;` pada baris `extension=pdo_pgsql`),
+   lalu pastikan ekstensi terdeteksi:
    ```powershell
    C:\xampp\php\php.exe -m
    ```
-5. Jalankan **Apache** melalui XAMPP Control Panel.
-6. Buat konfigurasi database lokal:
+   Output harus memuat `pdo_pgsql`.
+3. Simpan proyek di folder mana saja, misalnya:
+   `C:\projects\Pencatatan-Pemasukan-dan-Pengeluaran` (tidak perlu di `htdocs`).
+4. Dari folder utama proyek, buat konfigurasi database lokal:
    ```powershell
    Copy-Item backend\.env.example backend\.env
    ```
    Isi `DB_PASSWORD` di `backend\.env` dengan password PostgreSQL yang dibuat
    saat PostgreSQL dipasang.
-7. Jalankan skema database:
+5. Siapkan database dan tabel:
    ```powershell
    C:\xampp\php\php.exe database\setup.php
    ```
    Pengguna PostgreSQL perlu memiliki izin membuat database (default `postgres`
    biasanya memilikinya).
-8. Buka `http://localhost/Pencatatan-Pemasukan-dan-Pengeluaran/frontend/`.
-   Jangan buka `frontend/index.html` langsung atau melalui Live Server VS Code:
-   keduanya tidak menjalankan PHP API.
-9. Daftar akun baru, lalu tambah atau kelola transaksi. Data akan disimpan di database.
+6. Alternatifnya, dari folder utama proyek jalankan server bawaan PHP secara manual:
+   ```powershell
+   C:\xampp\php\php.exe -S 127.0.0.1:8000 -t .
+   ```
+   Perintah ini menjalankan PHP tanpa Apache. Biarkan terminal tetap terbuka,
+   lalu buka `http://127.0.0.1:8000/frontend/`. Mode ini menggunakan PHP API dan
+   PostgreSQL; berbeda dengan mode lokal yang dibuka langsung dari file.
+7. Daftar akun baru, lalu tambah atau kelola transaksi. Data akan disimpan di database.
 
 Grafik Chart.js dimuat dari CDN, sehingga koneksi internet diperlukan agar grafik
 dapat ditampilkan. Formulir dan daftar transaksi tetap dapat digunakan jika grafik
@@ -96,4 +117,4 @@ Jalankan perintah berikut dari folder proyek untuk mulai melacak perubahan:
 git init
 git add .
 git commit -m "Membuat dashboard awal KeuanganKu"
-```
+```"# Pencatatan-Pemasukan-dan-Pengeluaran" 
