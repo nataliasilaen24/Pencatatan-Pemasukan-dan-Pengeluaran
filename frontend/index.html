@@ -8,6 +8,49 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <section id="authGate" class="auth-gate" hidden>
+        <div class="auth-card">
+            <div class="auth-brand">
+                <span class="brand-mark">
+                    <svg class="icon"><use href="#icon-wallet"></use></svg>
+                </span>
+                <span class="brand-name">KeuanganKu</span>
+            </div>
+            <h1 id="authTitle">Masuk ke akun</h1>
+            <p id="authDescription">Kelola keuanganmu dengan aman.</p>
+            <div id="authFeedback" class="feedback" role="status" aria-live="polite" hidden></div>
+            <form id="loginForm" class="auth-form">
+                <label class="field">
+                    <span>Email</span>
+                    <input type="email" id="loginEmail" autocomplete="email" required>
+                </label>
+                <label class="field">
+                    <span>Password</span>
+                    <input type="password" id="loginPassword" autocomplete="current-password" minlength="8" required>
+                </label>
+                <button class="primary-button" type="submit">Masuk</button>
+            </form>
+            <form id="registerForm" class="auth-form" hidden>
+                <label class="field">
+                    <span>Nama</span>
+                    <input type="text" id="registerName" maxlength="100" autocomplete="name" required>
+                </label>
+                <label class="field">
+                    <span>Email</span>
+                    <input type="email" id="registerEmail" autocomplete="email" required>
+                </label>
+                <label class="field">
+                    <span>Password</span>
+                    <input type="password" id="registerPassword" autocomplete="new-password" minlength="8" required>
+                </label>
+                <button class="primary-button" type="submit">Daftar</button>
+            </form>
+            <button id="authModeButton" class="auth-mode-button" type="button">
+                Belum punya akun? Daftar
+            </button>
+        </div>
+    </section>
+
     <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <symbol id="icon-grid" viewBox="0 0 24 24">
             <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>

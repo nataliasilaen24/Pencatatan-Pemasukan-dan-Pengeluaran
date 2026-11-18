@@ -19,15 +19,25 @@ pengelolaan transaksi di frontend.
 - Penyimpanan sementara menggunakan `localStorage` pada browser yang digunakan.
 - Tampilan responsif untuk desktop dan smartphone.
 
-Profil masih berupa informasi karena sistem akun belum dibuat. Logout memberi tahu
-bahwa autentikasi belum tersedia dan tidak menghapus data. Versi ini belum
-menggunakan backend PHP atau MySQL. Data di `localStorage` hanya tersedia di
-browser/perangkat ini dan bukan penyimpanan aman untuk data sensitif.
+Versi ini menggunakan PHP session, API PHP, dan database PostgreSQL. Data
+transaksi dan kategori dipisahkan berdasarkan akun pengguna. Password disimpan
+dalam bentuk hash dan koneksi database menggunakan prepared statements.
 
 ## Lokasi file
 
 ```text
 Pencatatan-Pemasukan-dan-Pengeluaran/
+├── backend/
+│   ├── api/
+│   │   ├── auth.php
+│   │   ├── categories.php
+│   │   └── transactions.php
+│   └── config/
+│       ├── bootstrap.php
+│       └── database.php
+├── database/
+│   ├── schema.sql
+│   └── setup.php
 ├── frontend/
 │   ├── css/
 │   │   └── style.css
@@ -37,17 +47,35 @@ Pencatatan-Pemasukan-dan-Pengeluaran/
 └── README.md
 ```
 
-## Menjalankan dengan XAMPP
+## Menjalankan dengan PostgreSQL dan Apache XAMPP
 
 1. Pasang dan buka XAMPP.
 2. Salin folder proyek ke dalam folder `htdocs`, misalnya:
    `C:\xampp\htdocs\Pencatatan-Pemasukan-dan-Pengeluaran`
-3. Jalankan **Apache** melalui XAMPP Control Panel. MySQL belum diperlukan pada
-   tahap ini.
-4. Buka alamat berikut di browser:
-   `http://localhost/Pencatatan-Pemasukan-dan-Pengeluaran/frontend/`
-5. Pilih **Tambah Transaksi**, isi formulir, lalu simpan. Data dan ringkasan akan
-   diperbarui otomatis.
+3. Pasang PostgreSQL lokal dan jalankan servicenya. **MySQL di XAMPP tidak diperlukan**.
+4. Aktifkan ekstensi PostgreSQL untuk PHP XAMPP dengan membuka
+   `C:\xampp\php\php.ini`, menghapus tanda `;` pada baris `extension=pdo_pgsql`,
+   lalu restart Apache. Pastikan perintah berikut menampilkan `pdo_pgsql`:
+   ```powershell
+   C:\xampp\php\php.exe -m
+   ```
+5. Jalankan **Apache** melalui XAMPP Control Panel.
+6. Buat konfigurasi database lokal:
+   ```powershell
+   Copy-Item backend\.env.example backend\.env
+   ```
+   Isi `DB_PASSWORD` di `backend\.env` dengan password PostgreSQL yang dibuat
+   saat PostgreSQL dipasang.
+7. Jalankan skema database:
+   ```powershell
+   C:\xampp\php\php.exe database\setup.php
+   ```
+   Pengguna PostgreSQL perlu memiliki izin membuat database (default `postgres`
+   biasanya memilikinya).
+8. Buka `http://localhost/Pencatatan-Pemasukan-dan-Pengeluaran/frontend/`.
+   Jangan buka `frontend/index.html` langsung atau melalui Live Server VS Code:
+   keduanya tidak menjalankan PHP API.
+9. Daftar akun baru, lalu tambah atau kelola transaksi. Data akan disimpan di database.
 
 Grafik Chart.js dimuat dari CDN, sehingga koneksi internet diperlukan agar grafik
 dapat ditampilkan. Formulir dan daftar transaksi tetap dapat digunakan jika grafik
@@ -55,10 +83,10 @@ tidak berhasil dimuat.
 
 ## Langkah pengembangan berikutnya
 
-1. Membuat skema database MySQL serta API backend PHP menggunakan prepared statements.
-2. Memindahkan penyimpanan transaksi dan kategori dari `localStorage` ke database.
-3. Membuat autentikasi dan memastikan data terpisah untuk setiap pengguna.
-4. Menghubungkan profil dan logout dengan sistem akun.
+1. Menambahkan migrasi data dari `localStorage` pengguna lama ke akun database.
+2. Menambahkan pengujian otomatis untuk API autentikasi, transaksi, dan kategori.
+3. Menambahkan pemulihan password dan verifikasi email.
+4. Menyiapkan deployment produksi beserta HTTPS dan konfigurasi database khusus.
 
 ## Git (opsional)
 

@@ -2,6 +2,7 @@
 
 const STORAGE_KEY = "keuanganKuTransaksi";
 const CATEGORY_STORAGE_KEY = "keuanganKuKategori";
+const API_BASE = "../backend/api";
 const DEFAULT_CATEGORIES = {
     pemasukan: ["Gaji", "Uang saku", "Bonus", "Pendapatan lainnya"],
     pengeluaran: [
@@ -45,6 +46,8 @@ let transaksi = loadTransactions();
 let chart = null;
 let reportChart = null;
 let reportTransactions = [];
+let categoryIds = { pemasukan: {}, pengeluaran: {} };
+let isAuthenticated = false;
 
 function localDateValue(date) {
     const year = date.getFullYear();
@@ -65,32 +68,7 @@ function isValidTransaction(item) {
 }
 
 function loadTransactions() {
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (!stored) {
-            return [];
-        }
-
-        const parsed = JSON.parse(stored);
-        if (!Array.isArray(parsed)) {
-            throw new Error("Format data transaksi tidak valid.");
-        }
-
-        const valid = parsed.filter(isValidTransaction);
-        if (valid.length !== parsed.length) {
-            showGlobalFeedback(
-                "Sebagian data transaksi di perangkat ini tidak valid dan tidak ditampilkan.",
-                "error"
-            );
-        }
-        return valid;
-    } catch (error) {
-        showGlobalFeedback(
-            `Data transaksi tidak dapat dibaca: ${error.message}`,
-            "error"
-        );
-        return [];
-    }
+    return [];
 }
 
 function copyCategories(source) {
@@ -101,36 +79,7 @@ function copyCategories(source) {
 }
 
 function loadCategories() {
-    try {
-        const stored = localStorage.getItem(CATEGORY_STORAGE_KEY);
-        if (!stored) {
-            return copyCategories(DEFAULT_CATEGORIES);
-        }
-
-        const parsed = JSON.parse(stored);
-        if (!parsed || !Array.isArray(parsed.pemasukan) || !Array.isArray(parsed.pengeluaran)) {
-            throw new Error("Format data kategori tidak valid.");
-        }
-
-        const result = { pemasukan: [], pengeluaran: [] };
-        let invalidEntries = false;
-        ["pemasukan", "pengeluaran"].forEach(type => {
-            parsed[type].forEach(value => {
-                if (typeof value !== "string" || !value.trim() || result[type].includes(value.trim())) {
-                    invalidEntries = true;
-                    return;
-                }
-                result[type].push(value.trim());
-            });
-        });
-        if (invalidEntries) {
-            showGlobalFeedback("Sebagian data kategori tidak valid dan tidak ditampilkan.", "error");
-        }
-        return result;
-    } catch (error) {
-        showGlobalFeedback(`Data kategori tidak dapat dibaca: ${error.message}`, "error");
-        return copyCategories(DEFAULT_CATEGORIES);
-    }
+    return copyCategories(DEFAULT_CATEGORIES);
 }
 
 function saveTransactions() {
@@ -210,6 +159,63 @@ function hideFeedback() {
     feedback.hidden = true;
     feedback.textContent = "";
     feedback.className = "feedback";
+}
+
+async function apiFetch(path, options = {}) {
+    let response;
+    try {
+        response = await fetch(`${API_BASE}${path}`, {
+            ...options,
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
+        });
+    } catch (error) {
+        if (error instanceof TypeError) {
+            throw new Error(
+                "API tidak dapat dihubungi. Jalankan Apache di XAMPP dan pastikan PostgreSQL aktif, lalu buka aplikasi melalui http://localhost."
+            );
+        }
+        throw error;
+    }
+    let payload = {};
+    try {
+        payload = await response.json();
+    } catch (error) {
+        if (!response.ok) {
+            throw new Error("Server tidak dapat dijangkau.");
+        }
+    }
+    if (!response.ok) {
+        throw new Error(payload.error || "Permintaan gagal.");
+    }
+    return payload;
+}
+
+async function loadBackendState() {
+    const categoryData = await apiFetch("/categories.php");
+    categoryIds = { pemasukan: {}, pengeluaran: {} };
+    categories = { pemasukan: [], pengeluaran: [] };
+    ["pemasukan", "pengeluaran"].forEach(type => {
+        categoryData[type].forEach(category => {
+            categories[type].push(category.name);
+            categoryIds[type][category.name] = category.id;
+        });
+    });
+
+    const transactionData = await apiFetch("/transactions.php");
+    transaksi = transactionData.transactions.map(item => ({
+        id: item.id,
+        tanggal: item.transaction_date,
+        keterangan: item.name,
+        kategori: item.category,
+        jenis: item.type,
+        jumlah: Number(item.amount),
+        catatan: item.note || "",
+        createdAt: item.created_at ? Date.parse(item.created_at.replace(" ", "T")) : Date.now()
+    }));
 }
 
 function formatRupiah(amount) {
@@ -931,7 +937,7 @@ function startCategoryEdit(type, category) {
     document.getElementById("categoryName").focus();
 }
 
-function handleCategoryAction(event) {
+async function handleCategoryAction(event) {
     const button = event.target.closest("button[data-category-action]");
     if (!button) {
         return;
@@ -942,27 +948,24 @@ function handleCategoryAction(event) {
         return;
     }
 
-    if (transaksi.some(item => item.jenis === categoryType && item.kategori === category)) {
-        showCategoryFeedback("Kategori masih digunakan transaksi, jadi belum dapat dihapus.", "error");
-        return;
-    }
     if (!window.confirm(`Hapus kategori "${category}"?`)) {
         return;
     }
-
-    const nextCategories = copyCategories(categories);
-    nextCategories[categoryType] = nextCategories[categoryType].filter(item => item !== category);
-    if (persistCategoryState(nextCategories, [...transaksi])) {
+    try {
+        await apiFetch(`/categories.php?id=${categoryIds[categoryType][category]}`, { method: "DELETE" });
+        await loadBackendState();
         renderCategories();
         populateCategorySelect(categoryInput, typeInput.value);
         populateCategorySelect(quickCategoryInput, quickTypeInput.value);
         populateDashboardCategoryFilter();
         renderApp();
         showCategoryFeedback("Kategori berhasil dihapus.", "success");
+    } catch (error) {
+        showCategoryFeedback(error.message, "error");
     }
 }
 
-function saveCategory(event) {
+async function saveCategory(event) {
     event.preventDefault();
     const categoryForm = document.getElementById("categoryForm");
     if (!categoryForm.reportValidity()) {
@@ -985,24 +988,19 @@ function saveCategory(event) {
         return;
     }
 
-    const nextCategories = copyCategories(categories);
-    const nextTransactions = transaksi.map(item => ({ ...item }));
-    if (originalType) {
-        nextCategories[originalType] = nextCategories[originalType].map(category =>
-            category === originalName ? name : category
-        );
-        if (originalName !== name) {
-            nextTransactions.forEach(item => {
-                if (item.jenis === originalType && item.kategori === originalName) {
-                    item.kategori = name;
-                }
+    try {
+        if (originalType) {
+            await apiFetch(`/categories.php?id=${categoryIds[originalType][originalName]}`, {
+                method: "PUT",
+                body: JSON.stringify({ name })
+            });
+        } else {
+            await apiFetch("/categories.php", {
+                method: "POST",
+                body: JSON.stringify({ type, name })
             });
         }
-    } else {
-        nextCategories[type].push(name);
-    }
-
-    if (persistCategoryState(nextCategories, nextTransactions)) {
+        await loadBackendState();
         resetCategoryForm();
         renderCategories();
         populateCategorySelect(categoryInput, typeInput.value);
@@ -1010,6 +1008,8 @@ function saveCategory(event) {
         populateDashboardCategoryFilter();
         renderApp();
         showCategoryFeedback(originalType ? "Perubahan kategori berhasil disimpan." : "Kategori berhasil ditambahkan.", "success");
+    } catch (error) {
+        showCategoryFeedback(error.message, "error");
     }
 }
 
@@ -1031,16 +1031,32 @@ function resetQuickForm() {
     quickDateInput.value = localDateValue(new Date());
 }
 
-function persistTransaction(item, existing) {
-    if (existing) {
-        transaksi = transaksi.map(transaction => transaction.id === existing.id ? item : transaction);
-    } else {
-        transaksi.push(item);
+async function persistTransaction(item, existing) {
+    const categoryId = categoryIds[item.jenis][item.kategori];
+    if (!categoryId) {
+        showGlobalFeedback("Kategori transaksi tidak tersedia.", "error");
+        return false;
     }
 
-    const saved = saveTransactions();
-    renderApp();
-    return saved;
+    try {
+        await apiFetch(existing ? `/transactions.php?id=${encodeURIComponent(existing.id)}` : "/transactions.php", {
+            method: existing ? "PUT" : "POST",
+            body: JSON.stringify({
+                date: item.tanggal,
+                name: item.keterangan,
+                type: item.jenis,
+                category_id: categoryId,
+                amount: item.jumlah,
+                note: item.catatan
+            })
+        });
+        await loadBackendState();
+        renderApp();
+        return true;
+    } catch (error) {
+        showGlobalFeedback(error.message, "error");
+        return false;
+    }
 }
 
 function openTransactionForm() {
@@ -1143,7 +1159,7 @@ function editTransaction(id) {
     document.getElementById("keterangan").focus();
 }
 
-function deleteTransaction(id) {
+async function deleteTransaction(id) {
     const item = transaksi.find(transaction => transaction.id === id);
     if (!item) {
         showFeedback("Transaksi yang ingin dihapus tidak ditemukan.", "error");
@@ -1154,11 +1170,13 @@ function deleteTransaction(id) {
         return;
     }
 
-    transaksi = transaksi.filter(transaction => transaction.id !== id);
-    const saved = saveTransactions();
-    renderApp();
-    if (saved) {
+    try {
+        await apiFetch(`/transactions.php?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+        await loadBackendState();
+        renderApp();
         showGlobalFeedback("Transaksi berhasil dihapus.", "success");
+    } catch (error) {
+        showGlobalFeedback(error.message, "error");
     }
 }
 
@@ -1190,11 +1208,17 @@ document.querySelectorAll('[data-action="add-transaction"]').forEach(button => {
     button.addEventListener("click", openTransactionForm);
 });
 
-document.querySelector('[data-action="logout"]').addEventListener("click", () => {
-    showGlobalFeedback(
-        "Logout belum tersedia karena sistem akun belum dibuat. Data transaksi tidak dihapus.",
-        "info"
-    );
+document.querySelector('[data-action="logout"]').addEventListener("click", async () => {
+    try {
+        await apiFetch("/auth.php?action=logout", { method: "POST", body: "{}" });
+        isAuthenticated = false;
+        transaksi = [];
+        showView("dashboard");
+        document.getElementById("authGate").hidden = false;
+        document.getElementById("loginForm").reset();
+    } catch (error) {
+        showGlobalFeedback(error.message, "error");
+    }
 });
 
 document.querySelector('[data-action="notifications"]').addEventListener("click", () => {
@@ -1222,7 +1246,7 @@ chartMonthFilter.addEventListener("change", renderChart);
     input.addEventListener(id === "dashboardSearch" ? "input" : "change", renderTransactionTables);
 });
 
-quickForm.addEventListener("submit", event => {
+quickForm.addEventListener("submit", async event => {
     event.preventDefault();
     if (!quickForm.reportValidity()) {
         return;
@@ -1246,14 +1270,14 @@ quickForm.addEventListener("submit", event => {
         return;
     }
 
-    const saved = persistTransaction(item, null);
+    const saved = await persistTransaction(item, null);
     resetQuickForm();
     if (saved) {
         showGlobalFeedback("Transaksi berhasil ditambahkan.", "success");
     }
 });
 
-form.addEventListener("submit", event => {
+form.addEventListener("submit", async event => {
     event.preventDefault();
     if (!form.reportValidity()) {
         return;
@@ -1283,7 +1307,7 @@ form.addEventListener("submit", event => {
         return;
     }
 
-    const saved = persistTransaction(item, existing);
+    const saved = await persistTransaction(item, existing);
     resetForm();
     formPanel.hidden = true;
     document.getElementById("toggleFormButton").setAttribute("aria-expanded", "false");
@@ -1336,4 +1360,93 @@ populateQuickCategories();
 populateDashboardCategoryFilter();
 renderCategories();
 document.getElementById("toggleFormButton").setAttribute("aria-expanded", "false");
-renderApp();
+
+function showAuthFeedback(message, kind) {
+    const authFeedback = document.getElementById("authFeedback");
+    authFeedback.textContent = message;
+    authFeedback.className = `feedback${kind ? ` is-${kind}` : ""}`;
+    authFeedback.hidden = false;
+}
+
+function applyUserProfile(user) {
+    const name = user.name || "Pengguna";
+    document.getElementById("pageTitle").textContent = `Halo, ${name}! 👋`;
+    const profileChip = document.querySelector(".profile-chip");
+    profileChip.querySelector(".avatar").textContent = name.charAt(0).toUpperCase();
+    profileChip.children[1].textContent = name;
+}
+
+async function enterApplication() {
+    isAuthenticated = true;
+    document.getElementById("authGate").hidden = true;
+    await loadBackendState();
+    populateCategories();
+    populateQuickCategories();
+    populateDashboardCategoryFilter();
+    renderCategories();
+    renderApp();
+}
+
+async function checkSession() {
+    try {
+        const payload = await apiFetch("/auth.php?action=me");
+        applyUserProfile(payload.user);
+        await enterApplication();
+    } catch (error) {
+        document.getElementById("authGate").hidden = false;
+    }
+}
+
+document.getElementById("authModeButton").addEventListener("click", () => {
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const switchingToRegister = loginForm.hidden;
+    loginForm.hidden = !switchingToRegister;
+    registerForm.hidden = switchingToRegister;
+    document.getElementById("authTitle").textContent = switchingToRegister ? "Masuk ke akun" : "Buat akun baru";
+    document.getElementById("authDescription").textContent = switchingToRegister
+        ? "Kelola keuanganmu dengan aman."
+        : "Daftar untuk menyimpan data di akunmu.";
+    document.getElementById("authModeButton").textContent = switchingToRegister
+        ? "Belum punya akun? Daftar"
+        : "Sudah punya akun? Masuk";
+    document.getElementById("authFeedback").hidden = true;
+});
+
+document.getElementById("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    try {
+        const payload = await apiFetch("/auth.php?action=login", {
+            method: "POST",
+            body: JSON.stringify({
+                email: document.getElementById("loginEmail").value,
+                password: document.getElementById("loginPassword").value
+            })
+        });
+        applyUserProfile(payload.user);
+        await enterApplication();
+    } catch (error) {
+        showAuthFeedback(error.message, "error");
+    }
+});
+
+document.getElementById("registerForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    try {
+        const payload = await apiFetch("/auth.php?action=register", {
+            method: "POST",
+            body: JSON.stringify({
+                name: document.getElementById("registerName").value,
+                email: document.getElementById("registerEmail").value,
+                password: document.getElementById("registerPassword").value
+            })
+        });
+        applyUserProfile(payload.user);
+        await enterApplication();
+    } catch (error) {
+        showAuthFeedback(error.message, "error");
+    }
+});
+
+document.getElementById("authGate").hidden = false;
+checkSession();

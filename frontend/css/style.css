@@ -17,11 +17,73 @@
     box-sizing: border-box;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 body {
     min-width: 320px;
     min-height: 100vh;
     margin: 0;
     background: #f5f7fc;
+}
+
+.auth-gate {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: #eef3fc;
+}
+
+.auth-card {
+    width: min(420px, 100%);
+    padding: 32px;
+    border: 1px solid #edf0f6;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(35, 55, 95, 0.14);
+}
+
+.auth-card .auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.auth-card .brand-name {
+    color: #1d2942;
+}
+
+.auth-card h1 {
+    margin: 0 0 6px;
+    font-family: "Manrope", "Segoe UI", sans-serif;
+}
+
+.auth-card > p {
+    margin: 0 0 18px;
+    color: var(--muted);
+}
+
+.auth-form {
+    display: grid;
+    gap: 14px;
+}
+
+.auth-form .primary-button {
+    width: 100%;
+}
+
+.auth-mode-button {
+    width: 100%;
+    margin-top: 14px;
+    border: 0;
+    background: transparent;
+    color: var(--blue);
+    font-weight: 700;
 }
 
 button,
